@@ -15,7 +15,9 @@ class AccountInvoice(models.Model):
            root_view = View.browse(view_id).read_combined(['arch'])
            res['arch'] = root_view['arch']
         doc = etree.XML(res['arch'])
-        for node in doc.xpath("//group/field[@name='currency_id']"):
+        #Tambahan biar tidak error customer invoice
+        if self.env.context.get('type') == 'in_invoice':
+          for node in doc.xpath("//group/field[@name='currency_id']"):
             landed_cost = etree.Element('field', {'name': 'cost_id'})
             node.addnext(landed_cost)
             landed_cost.addnext(etree.Element('button', {'name': 'create_landed_cost', 'string': 'Create Landed Cost', 'type': 'object', 'attrs': "{'invisible': [('cost_id', '!=', False)]}"}))
